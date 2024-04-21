@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 
 const Entry = () => {
   const [goTo, setGoTo] = useState("");
-  const { user, setUser } = useContext(context);
+  const { user } = useContext(context);
   useEffect(() => {
     setTimeout(() => {
       //here i want to access my cookie

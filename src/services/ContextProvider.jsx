@@ -9,6 +9,8 @@ export const context = createContext({
   setLoading: () => null,
   user: null,
   setUser: () => null,
+  selectedDates: null,
+  setSelectedDates: () => null,
 });
 const ContextProvider = ({ children }) => {
   const [phone, setPhone] = useState(null);
@@ -17,6 +19,7 @@ const ContextProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [selectedDates, setSelectedDates] = useState([]);
   return (
     <context.Provider
       value={{
@@ -28,6 +31,8 @@ const ContextProvider = ({ children }) => {
         loading,
         user,
         setUser,
+        selectedDates,
+        setSelectedDates,
       }}
     >
       {children}

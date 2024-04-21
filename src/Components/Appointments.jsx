@@ -1,46 +1,167 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Cards from "./Cards";
+import { context } from "../services/ContextProvider";
+import { collection, doc, getDocs } from "firebase/firestore";
+import { auth, db } from "../services/firebase";
+import { YearAndMonth } from "../services/helpers";
+import { twMerge } from "tailwind-merge";
+import CompletedCards from "./CompletedCards";
 
 const Appointments = () => {
+  const { loading, setLoading } = useContext(context);
+  const [appointments, setAppointments] = useState([]);
+  useEffect(() => {
+    const initialFetch = async () => {
+      try {
+        setLoading(true);
+        const ref = collection(db, "users");
+        const data = await getDocs(ref);
+        const filteredData = data.docs.map((d) => ({ ...d.data(), id: d.id }));
+        const filteredUser = filteredData.find(
+          (d) => d.id === auth.currentUser.phoneNumber
+        );
+
+        if (filteredUser?.bookings.length > 0) {
+          const bookingPromises = filteredUser.bookings.map(async (booking) => {
+            const bookingDocRef = doc(db, "bookings", YearAndMonth);
+            const subCollectionRef = collection(bookingDocRef, booking);
+            const data1 = await getDocs(subCollectionRef);
+            const filteredBookingData = data1.docs.map((d) => ({
+              ...d.data(),
+              id: d.id,
+            }));
+            const filteredBooking = filteredBookingData.find(
+              (d) => d.id === auth.currentUser.phoneNumber
+            );
+            return filteredBooking;
+          });
+
+          const appointments = await Promise.all(bookingPromises);
+          console.log(appointments);
+          setAppointments([...appointments]);
+        }
+      } catch (error) {
+        console.log(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    initialFetch();
+  }, [setLoading]);
+
   return (
-    <div className="h-full min-h-screen w-full px-2  lg:w-2/3 ">
-      <div className="mx-auto max-w-lg text-center mt-14 mb-7">
-        <h1 className="text-2xl font-bold sm:text-3xl text-black">
-          Hello there 👋
-        </h1>
-      </div>
-      <div className="space-y-4">
-        <details
-          className="group [&_summary::-webkit-details-marker]:hidden"
-          open
-        >
-          <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-2 text-black">
-            <h2 className="font-medium">Upcoming Appointments</h2>
-
-            <svg
-              className="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </summary>
-
-          <div className="flex flex-wrap justify-center gap-3 mt-3">
-            <Cards date={new Date("2024-04-15T04:30:00")} />
-            <Cards date={new Date("2024-04-14T12:00:00")} />
-            <Cards date={new Date("2024-04-17T21:30:00")} />
-            <Cards date={new Date("2024-05-20T01:00:00")} />
+    <div
+      className={twMerge(
+        "h-full min-h-screen w-full px-2  lg:w-2/3 ",
+        loading && "flex justify-center items-center"
+      )}
+    >
+      {loading ? (
+        <span className="loading loading-infinity loading-lg text-black"></span>
+      ) : (
+        <>
+          <div className="mx-auto max-w-lg text-center mt-5 lg:mt-12 mb-7">
+            <h1 className="text-2xl font-bold sm:text-3xl text-black">
+              Hello there 👋
+            </h1>
           </div>
-        </details>
-      </div>
+          <div className="space-y-4">
+            <details
+              className="group [&_summary::-webkit-details-marker]:hidden"
+              open
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-2 text-black">
+                <h2 className="font-medium">Upcoming Appointments</h2>
+
+                <svg
+                  className="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </summary>
+
+              {appointments.length === 0 ? (
+                <div>
+                  <h1 className="text-2xl font-bold sm:text-3xl text-black">
+                    You have no previous appointments
+                  </h1>
+                </div>
+              ) : (
+                <div className="flex flex-wrap justify-center gap-3 mt-3 mb-5">
+                  {appointments.map((appointment, index) => {
+                    return (
+                      <Cards
+                        key={index}
+                        date={new Date(appointment.date).toLocaleDateString(
+                          "en-US"
+                        )}
+                        time={appointment.time}
+                        name={appointment.name}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </details>
+          </div>
+          <div className="space-y-4 mt-5">
+            <details
+              className="group [&_summary::-webkit-details-marker]:hidden"
+              open
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-2 text-black">
+                <h2 className="font-medium">Previous Appointments</h2>
+
+                <svg
+                  className="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </summary>
+              {appointments.length === 0 ? (
+                <div>
+                  <h1 className="text-2xl font-bold sm:text-3xl text-black">
+                    You have no previous appointments
+                  </h1>
+                </div>
+              ) : (
+                <div className="flex flex-wrap justify-center gap-3 mt-3 mb-5">
+                  {appointments.map((appointment, index) => {
+                    return (
+                      <CompletedCards
+                        key={index}
+                        date={new Date(appointment.date).toLocaleDateString(
+                          "en-US"
+                        )}
+                        time={appointment.time}
+                        name={appointment.name}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </details>
+          </div>
+        </>
+      )}
     </div>
   );
 };
