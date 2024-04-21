@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { context } from "../services/ContextProvider";
+import toast from "react-hot-toast";
 
 const Booking = () => {
   const {
@@ -38,10 +39,11 @@ const Booking = () => {
       });
       return;
     }
+    const finalData = { ...data, time, date };
 
     // Send formatted date and time along with other data
-    const finalData = { ...data, time, date };
     uploadToFirebase(finalData, setErr, setLoading, map, setDone);
+    toast.success("booked a slot successfully");
   };
 
   useEffect(() => {
