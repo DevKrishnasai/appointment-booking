@@ -1,13 +1,7 @@
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth, db } from "./firebase";
 import Cookies from "js-cookie";
-import {
-  arrayUnion,
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
+import { arrayUnion, collection, doc, setDoc } from "firebase/firestore";
 
 export const YearAndMonth =
   new Date(Date.now()).getFullYear().toString() +
@@ -120,24 +114,24 @@ export const uploadToFirebase = async (
     const bookingDocRef = doc(db, "bookings", YearAndMonth);
     const subCollectionName = data.date + "--" + data.time;
     const subCollectionRef = collection(bookingDocRef, subCollectionName);
-    const data1 = await getDocs(subCollectionRef);
-    const filteredData = data1.docs.map((d) => ({ ...d.data(), id: d.id }));
-    const filtered = filteredData.find(
-      (d) => d.id === auth.currentUser.phoneNumber
-    );
-    if (filtered) {
-      if (filtered.id === auth.currentUser.phoneNumber) {
-        setErr({
-          errMsg: "You have already booked this slot",
-        });
-        return;
-      } else {
-        setErr({
-          errMsg: "someone have booked this slot",
-        });
-        return;
-      }
-    }
+    // const data1 = await getDocs(subCollectionRef);
+    // const filteredData = data1.docs.map((d) => ({ ...d.data(), id: d.id }));
+    // const filtered = filteredData.find(
+    //   (d) => d.id === auth.currentUser.phoneNumber
+    // );
+    // if (filtered) {
+    //   if (filtered.id === auth.currentUser.phoneNumber) {
+    //     setErr({
+    //       errMsg: "You have already booked this slot",
+    //     });
+    //     return;
+    //   } else {
+    //     setErr({
+    //       errMsg: "someone have booked this slot",
+    //     });
+    //     return;
+    //   }
+    // }
 
     // Add doc for admin (nested adding (subcollection))
     const userDocRef = doc(subCollectionRef, auth.currentUser.phoneNumber);
