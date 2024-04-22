@@ -138,7 +138,7 @@ const SlotsUpdation = () => {
                   setMap((m) => ({
                     ...m,
                     [rawdates[rawdates.length - 1]]: {
-                      availableTimes: [],
+                      availableTimes: [...timeSlots],
                       bookedTimes: [],
                     },
                   }));

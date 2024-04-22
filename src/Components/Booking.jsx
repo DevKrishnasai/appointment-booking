@@ -231,7 +231,7 @@ const Booking = () => {
             </div>
 
             {date && (
-              <div className="flex justify-center items-center">
+              <div className="flex justify-center items-center flex-wrap gap-2">
                 {map[date]?.availableTimes?.length > 0 &&
                   map[date]?.availableTimes.map((t) => {
                     return (
