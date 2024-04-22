@@ -20,6 +20,7 @@ const Booking = () => {
   const [err, setErr] = useState("");
   const [map, setMap] = useState({});
   const [done, setDone] = useState(false);
+  const [str, setStr] = useState(false);
 
   const { loading, setLoading, selectedDates, setSelectedDates } =
     useContext(context);
@@ -59,6 +60,9 @@ const Booking = () => {
         const dateArray = Object.keys(filtered.slots);
         setMap(filtered.slots);
         setSelectedDates(dateArray);
+        if (!dateArray.length) {
+          setStr(true);
+        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -73,7 +77,8 @@ const Booking = () => {
       className={twMerge(
         "min-h-[calc(100vh-50px)] ",
         loading && "flex flex-col justify-center items-center",
-        done && "flex flex-col justify-center items-center"
+        done && "flex flex-col justify-center items-center",
+        str && "flex flex-col justify-center items-center"
       )}
     >
       {loading ? (
@@ -87,6 +92,10 @@ const Booking = () => {
             year: "numeric",
           })}{" "}
           at {time} 🥳
+        </div>
+      ) : str ? (
+        <div className="text-black text-2xl font-bold ">
+          There are no slots available for this month
         </div>
       ) : (
         <>

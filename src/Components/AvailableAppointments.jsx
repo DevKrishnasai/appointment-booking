@@ -116,40 +116,42 @@ const AvailableAppointments = () => {
             )}
           </div>
 
-          <div className="space-y-4 mt-10">
-            <h1 className="text-xl font-bold lg:text-2xl text-black text-center">
-              Future Appointments
-            </h1>
-            {appointments.length === 0 ? (
+          {appointments.length !== 0 && (
+            <div className="space-y-4 mt-10">
               <h1 className="text-xl font-bold lg:text-2xl text-black text-center">
-                You have no appointments for today
+                Future Appointments
               </h1>
-            ) : (
-              <div className="flex flex-wrap justify-center gap-3 mt-3 mb-5">
-                {appointments.map((appointment, index) => {
-                  const today = new Date().toLocaleDateString("en-US");
-                  const date = new Date(appointment.date).toLocaleDateString(
-                    "en-US"
-                  );
+              {appointments.length === 0 ? (
+                <h1 className="text-xl font-bold lg:text-2xl text-black text-center">
+                  You have no appointments for today
+                </h1>
+              ) : (
+                <div className="flex flex-wrap justify-center gap-3 mt-3 mb-5">
+                  {appointments.map((appointment, index) => {
+                    const today = new Date().toLocaleDateString("en-US");
+                    const date = new Date(appointment.date).toLocaleDateString(
+                      "en-US"
+                    );
 
-                  return today !== date ? (
-                    <AdminCard
-                      key={index}
-                      date={new Date(appointment.date).toLocaleDateString(
-                        "en-US"
-                      )}
-                      time={appointment.time}
-                      name={appointment.name}
-                      phoneNumber={appointment.phoneNumber}
-                      city={appointment.city}
-                      state={appointment.state}
-                      pincode={appointment.pincode}
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
+                    return today !== date ? (
+                      <AdminCard
+                        key={index}
+                        date={new Date(appointment.date).toLocaleDateString(
+                          "en-US"
+                        )}
+                        time={appointment.time}
+                        name={appointment.name}
+                        phoneNumber={appointment.phoneNumber}
+                        city={appointment.city}
+                        state={appointment.state}
+                        pincode={appointment.pincode}
+                      />
+                    ) : null;
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
